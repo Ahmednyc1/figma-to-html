@@ -106,17 +106,12 @@ The `RenderNode` component:
 
 ## Current Limitations
 
-- **Static file export**: Currently renders in React, doesn't generate standalone HTML/CSS files
-- **File key**: Hardcoded to specific Figma file (needs to accept any file key)
-- **Advanced features**: Limited support for:
-  - Complex gradients
-  - Drop shadows and effects
-  - Images and icons
-  - Component instances
-  - Auto-layout constraints
-- **Text styling**: Doesn't handle mixed text styles within a single text node
-- **Responsive design**: Uses fixed positioning from Figma, not responsive
-
+- Uses inline styles (not separate CSS file)
+- Limited support for complex gradients
+- No support for images/icons from Figma
+- Drop shadows not implemented
+- Text with multiple styles not fully supported
+- Requires manual re-authentication to change file keys
 ## Known Issues
 
 - Requires both servers running simultaneously
