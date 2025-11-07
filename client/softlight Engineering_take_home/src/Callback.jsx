@@ -1,9 +1,9 @@
-import {useEffect,useState} from 'react';
+import {useActionState, useEffect,useState} from 'react';
 import RenderNode from './RenderNode';
 export default function Callback() {
     const [status,setStatus] = useState('Exchanging code...')
     const [fileData,setFileData] = useState(null);
-
+    const [fileKey,setFileKey] = useState('SESqJVzNvMuNa5p8Ss39ok');
     useEffect(() => {
         const params = new URLSearchParams(window.location.search)
         const code = params.get("code");
@@ -55,16 +55,61 @@ export default function Callback() {
 
 const handleDownload = () => {
   const el = document.querySelector("#figma-render-root");
-    const html = el ? el.innerHTML : "<!-- no render -->";
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "figma-output.html";
-    a.click();
-    URL.revokeObjectURL(url);
   
+  if (!el) {
+    alert("No render found");
+    return;
+  }
+
+  // Extract all the inline styles and convert to CSS classes
+  const html = el.innerHTML;
+  
+  // Generate a complete HTML document
+  const fullHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figma Export</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    #root {
+      position: relative;
+      width: ${frameBox?.width || 400}px;
+      height: ${frameBox?.height || 900}px;
+      margin: 20px auto;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    ${html}
+  </div>
+</body>
+</html>`;
+
+  const blob = new Blob([fullHTML], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "figma-output.html";
+  a.click();
+  URL.revokeObjectURL(url);
 };
+
 const firstChild = fileData?.document?.children?.[0];
 const frameBox = firstChild?.absoluteBoundingBox;
 
@@ -73,7 +118,7 @@ return (
   <div className="p-6 text-gray-900">
     <h1 className="text-2xl font-bold mb-4">OAuth Callback</h1>
     <div className="mb-4">{status}</div>
-
+   
     {fileData && (
       <div className="mt-6 space-y-6">
         
@@ -97,6 +142,16 @@ return (
         </div>
 
         
+<div className="mb-4">
+  <label className="text-sm text-gray-600">Figma File Key:</label>
+  <input
+    type="text"
+    value={fileKey}
+    onChange={(e) => setFileKey(e.target.value)}
+    className="w-full p-2 border rounded"
+    placeholder="Enter Figma file key"
+  />
+</div>
         {firstChild && (
           <div className="mt-10">
             <div className="flex items-center gap-4 mb-2">
